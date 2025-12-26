@@ -22,7 +22,10 @@ try:
 except ImportError:
     flash_attn = None
 
-from .serialization import encode
+try:
+    from .serialization import encode
+except ImportError:
+    from serialization import encode
 
 
 @torch.inference_mode()
