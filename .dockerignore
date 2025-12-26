@@ -1,0 +1,67 @@
+# Git
+.git
+.gitignore
+.gitmodules
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+*.egg-info
+dist
+build
+eggs
+*.egg
+.eggs
+
+# Compiled extensions (will be rebuilt in container)
+Pointcept/libs/pointops/build
+Pointcept/libs/pointops/pointops.egg-info
+Pointcept/libs/pointops2/build
+Pointcept/libs/pointops2/*.egg-info
+Pointcept/libs/pointgroup_ops/build
+Pointcept/libs/pointgroup_ops/*.egg-info
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Experiments and checkpoints (mount as volumes instead)
+experiments
+exp
+checkpoints
+*.pth
+*.pt
+*.ckpt
+
+# Data (mount as volumes instead)
+data
+*.parquet
+*.h5
+*.hdf5
+
+# Logs
+*.log
+logs
+runs
+wandb
+
+# Documentation
+*.md
+!README.md
+docs
+
+# Assets
+assets
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Misc
+.DS_Store
+Thumbs.db
+*.bak

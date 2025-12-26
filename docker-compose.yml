@@ -1,0 +1,92 @@
+# PointTransformerV3 Docker Compose Configuration
+# Usage: docker compose up -d
+
+version: "3.8"
+
+services:
+  ptv3:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        CUDA_VERSION: "13.0.0"
+        PYTHON_VERSION: "3.11"
+        PYTORCH_VERSION: "2.9.0"
+    image: ptv3:latest
+    container_name: ptv3
+
+    # GPU access
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+    # Interactive mode
+    stdin_open: true
+    tty: true
+
+    # Volumes - adjust paths as needed
+    volumes:
+      # Mount the entire eventssl-vol for data access
+      - /eventssl-vol:/eventssl-vol
+      # Mount local experiments directory
+      - ./experiments:/workspace/PointTransformerV3/experiments
+      # Optional: mount configs
+      - ./configs:/workspace/PointTransformerV3/configs
+
+    # Working directory
+    working_dir: /workspace/PointTransformerV3
+
+    # Environment variables
+    environment:
+      - CUDA_VISIBLE_DEVICES=0
+      - PYTHONUNBUFFERED=1
+      - WANDB_MODE=offline
+
+    # Shared memory size (important for DataLoader workers)
+    shm_size: "16gb"
+
+    # Keep container running
+    command: ["/bin/bash"]
+
+  # Training service (example)
+  ptv3-train:
+    extends:
+      service: ptv3
+    container_name: ptv3-train
+    command: ["python", "train_instance.py", "--config", "configs/cld_instance.yaml"]
+    profiles:
+      - training
+
+  # Evaluation service (example)
+  ptv3-eval:
+    extends:
+      service: ptv3
+    container_name: ptv3-eval
+    command: ["python", "evaluate_instance.py"]
+    profiles:
+      - evaluation
+
+# Usage Examples:
+# ---------------
+# Start interactive container:
+#   docker compose up -d ptv3
+#   docker compose exec ptv3 /bin/bash
+#
+# Run training:
+#   docker compose --profile training up ptv3-train
+#
+# Run evaluation:
+#   docker compose --profile evaluation up ptv3-eval
+#
+# Build image:
+#   docker compose build
+#
+# View logs:
+#   docker compose logs -f ptv3
+#
+# Stop all:
+#   docker compose down
